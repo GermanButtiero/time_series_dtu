@@ -2,20 +2,12 @@ Dtrain
 Dtest
 #install.packages("dplyr")  # Install (only needed once)
 library(dplyr)  # Load the package
+library(tidyverse)
 
-create_x <- function(df) {
-  df$time <- as.Date(df$time, format = "%Y-%m-%d")
-  df$year <- as.numeric(format(df$time, "%Y"))
-  df$month <- as.numeric(format(df$time, "%m"))
-  df$x <- df$year + (df$month - 1) / 12
-  return(df)
-}
-Dtrain <- create_x(Dtrain)
-
-plot(Dtrain$x, Dtrain$total)
+plot(Dtrain$year, Dtrain$total)
 
 # Fit a linear model
-fit <- lm(total ~ x, data = Dtrain)
+fit <- lm(total ~ year, data = Dtrain)
 summary(fit)
 
 # abline(fit, col = "red")
@@ -27,18 +19,14 @@ theta_hat_se <- summary(fit)$coef[, 2]
 theta_hat_se
 
 # Add the estimated mean to the plot
-lines(Dtrain$x, predict(fit), col = "red")
-
-Dtest <-create_x(Dtest)
-Dtest$x
+lines(Dtrain$year, predict(fit), col = "red")
 
 # Make a forecast with intervals
 Dtest$forecast <- predict(fit, newdata = Dtest, interval = "prediction", level=0.95)
 Dtest
 
-#append the time and forecast to a new data frame
-times <- Dtrain$time %>% c(Dtest$time)
-times
-forecasts <- Dtrain$total %>% c(Dtest$forecast[, 1])
-forecasts
-plot(times, forecasts)
+ggplot(Dtrain, aes(x = time, y = total)) +
+  geom_point(col="red") +
+  geom_line(aes(y=predict(fit)), col="red", size=.5) +
+  geom_line(data=Dtest, aes(y=forecast), col="blue", size=.5) +
+
