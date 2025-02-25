@@ -1,6 +1,9 @@
 #install.packages("dplyr")  # Install (only needed once)
 library(dplyr)  # Load the package
 library(tidyverse)
+library(ggplot2)
+library(httpgd)
+hgd()
 
 #getting data
 Dtrain
@@ -64,3 +67,95 @@ ggplot(Dtest, aes(x = time, y = e_ols)) +
 
 ##it doesnt seem like it matches the assumptions, as the errors should be distributed around the mean (0)
 # In contrast to the assumption, the errors on the plot are negative due to the forecast overshooting the actual values.
+
+
+# Part 3 - Weighted least squares
+
+## Define variables
+n <- length(Dtrain$time) # number of observations
+p <- 2 # number of parameters
+X <- cbind(1, Dtrain$year) # design matrix
+y <- Dtrain$total # response vector
+X_test <- cbind(1, Dtest$year) # design matrix for test data
+y_test <- Dtest$total # response vector for test data
+lambda <- 0.9 # exponential weights
+
+
+# 3.1 -- check slides
+## OLS -> identity matrix of size 72 x 72
+## WLS -> diagonal matrix of size 72 x 72 with 1/(lambda^(n-1)) on the diagonal)
+
+# 3.2
+## Calculate weights
+weights <- lambda^((n-1):0)
+## Plot the weights
+barplot(weights, names=1:72)
+
+# 3.3
+print(sum(weights)) # for WLS
+print(72) # for OLS -> sum of weights is equal to the number of observations
+
+# 3.4
+SIGMA <- diag(n)
+diag(SIGMA) <- 1/weights
+
+## Estimate parameters with WLS
+theta_WLS <- solve(t(X)%*%solve(SIGMA)%*%X)%*%(t(X)%*%solve(SIGMA)%*%y)
+print(theta_WLS)
+
+# 3.5
+## Train estimates from WLS
+yhat_wls <- X%*%theta_WLS
+
+## Test predictions from WLS
+y_pred_wls <- X_test%*%theta_WLS
+
+## Prediction intervals
+e_wls <- y - yhat_wls
+RSS_wls <- t(e_wls)%*%solve(SIGMA)%*%e_wls
+sigma2_wls <- as.numeric(RSS_wls/(n - p))
+Vmatrix_pred <- sigma2_wls * (1 + (X_test %*% solve(t(X)%*%solve(SIGMA)%*%X)) %*% t(X_test) )
+y_pred_lwr_wls <- y_pred_wls - qt(0.975, df=n-1)*sqrt(diag(Vmatrix_pred))
+y_pred_upr_wls <- y_pred_wls + qt(0.975, df=n-1)*sqrt(diag(Vmatrix_pred))
+
+## Add variables to dataframe
+Dtrain$yhat_wls <- yhat_wls
+Dtest$y_pred_wls <- y_pred_wls
+Dtest$y_pred_lwr_wls <- y_pred_lwr_wls
+Dtest$y_pred_upr_wls <- y_pred_upr_wls
+
+### Get estimates from OLS
+SIGMA_ols <- diag(n)
+
+## Estimate parameters with WLS
+theta_OLS <- solve(t(X)%*%solve(SIGMA_ols)%*%X)%*%(t(X)%*%solve(SIGMA_ols)%*%y)
+yhat_ols <- X%*%theta_OLS
+
+## Test predictions from WLS
+y_pred_ols <- X_test%*%theta_OLS
+
+## Add to dataframe
+Dtrain$yhat_ols <- yhat_ols
+
+
+## Plot data and predictions
+# plot WLS (blue) together with OLS (red) and true test data (black):
+ggplot(Dtrain, aes(x=year, y=total)) +
+  geom_point(col="red") + 
+
+  geom_line(aes(y=yhat_ols), col="red", size=.5, linetype=2) +
+  geom_point(data=Dtest, aes(x=year,y=forecast[,1]), col="red", size=.5) +
+  geom_ribbon(data=Dtest, aes(x=year,ymin=forecast[,2], ymax=forecast[,3]), inherit.aes=FALSE, alpha=0.1, fill="red") +
+
+  geom_point(data=Dtest, aes(x=year,y=total), col="black") +
+
+  geom_line(aes(y=yhat_wls), col="blue", size=.5) +
+  geom_point(data=Dtest, aes(x=year,y=y_pred_wls), col="blue", size=.5) +
+  geom_ribbon(data=Dtest, aes(x=year,ymin=y_pred_lwr_wls, ymax=y_pred_upr_wls), inherit.aes=FALSE, alpha=0.2, fill="blue") +
+  
+  coord_cartesian(xlim = c(2018,2025))
+
+
+# Part 4 - RLS and optimization of lambda
+
+# 4.1
