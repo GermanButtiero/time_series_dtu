@@ -34,7 +34,7 @@ Dtest$forecast #create table from this
 #2.4 plot everything with prediction intervals
 ggplot(Dtrain, aes(x = time, y = total)) +
   geom_point(col = "red") +
-  geom_line(aes(y = predict(fit)), col = "red", size = 0.8) +
+  geom_line(aes(y = predict(fitlm)), col = "red", size = 0.8) +
   geom_point(data = Dtest, aes(x = time, y = forecast[,1]), col = "blue", size = 0.5) +
   geom_ribbon(data = Dtest, aes(x = time, ymin = forecast[,2], ymax = forecast[,3]), inherit.aes=FALSE,fill = "red", alpha = 0.2) +
   geom_point(data=Dtest, aes(x = time, y = total), col = "blue", size = 0.8) # add the total for the test data - used in 2.5

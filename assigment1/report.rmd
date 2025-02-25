@@ -2,6 +2,7 @@
 title: "Assignment 1"
 output:
   pdf_document: default
+  fig_caption: yes
   html_document:
     df_print: paged
 date: "2025-02-21"
@@ -9,39 +10,10 @@ date: "2025-02-21"
 
 #### Group members: Keerthi (s243933), Katarina (s243906), Hubert (s243896), German (s243660)
 
-```{r, echo=FALSE, include=FALSE}
-
-D <- read.csv("DST_BIL54.csv")
-str(D)
-
-# See the help
-?strftime
-D$time <- as.POSIXct(paste0(D$time,"-01"), "%Y-%m-%d", tz="UTC")
-D$time
-class(D$time)
-
-## Year to month for each of them
-D$year <- 1900 + as.POSIXlt(D$time)$year + as.POSIXlt(D$time)$mon / 12
-
-## Make the output variable a floating point (i.e.\ decimal number)
-D$total <- as.numeric(D$total) / 1E6
-
-## Divide intro train and test set
-teststart <- as.POSIXct("2024-01-01", tz="UTC")
-Dtrain <- D[D$time < teststart, ]
-Dtest <- D[D$time >= teststart, ]
-```
-
 
 ## 1 Plot data
 
 ### 1.1.
-```{r, echo=FALSE}
-x <- Dtrain$year
-y <- Dtrain$total
-
-plot(x,y)
-```
 
 ```{r, fig.align='center', out.width='70%', fig.cap='The plot of observations.', echo=FALSE}
 knitr::include_graphics("plots/dtrain_plot.png")
@@ -52,6 +24,7 @@ There seems to be a general positive trend of number of vehicles in Denmark over
 ### 2 Linear trend model
 
 #### 2.1
+[todo] [for each member]
 $$
 y = \begin{bmatrix}
 2.930 \\
@@ -67,37 +40,63 @@ X = \begin{bmatrix}
 $$
 
 ### 2.2
-```{r}
-# Fit a linear model
-fit <- lm(total ~ year, data = Dtrain)
-summary(fit)
 
-# abline(fit, col = "red")
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Parameter} & \textbf{Estimate} ($\hat{\theta}$) & \textbf{Standard Error} ($\hat{\sigma}_{\hat{\theta}}$) \\
+\hline
+$\hat{\theta}_1$ & -110.36 & 3.59 \\
+\hline
+$\hat{\theta}_2$ & 0.056 & 0.0018 \\
+\hline
+\end{tabular}
+\caption{Parameter Estimates and Standard Errors}
+\label{tab:parameters}
+\end{table}
 
-# Extract the parameter estimates and their standard errors
-theta_hat <- coef(fit)
-theta_hat
-theta_hat_se <- summary(fit)$coef[, 2]
-theta_hat_se
+```{r, fig.align='center', out.width='70%', fig.cap='Observations and OLS Estimated Mean', echo=FALSE}
+knitr::include_graphics("plots/estimated_mean.png")
 ```
 
-$$
-\hat \theta = \begin{bmatrix}
--110.4 \\
-0.05615
-\end{bmatrix},
-\quad
-\hat \sigma = \begin{bmatrix}
-3.594 \\
-0.001778
-\end{bmatrix}
-$$
-```{r}
-plot(x, y)
-lines(Dtrain$year, predict(fit), col = "red")
+### 2.3
+The forecast results are presented in Table \ref{tab:forecast-results}.
+
+\begin{table}[htbp]
+\centering
+\caption{Forecast Results}
+\label{tab:forecast-results}
+\begin{tabular}{cccc}
+\hline
+& fit & lwr & upr \\
+\hline
+73 & 3.281154 & 3.227579 & 3.334728 \\
+74 & 3.285832 & 3.232198 & 3.339467 \\
+75 & 3.290511 & 3.236815 & 3.344208 \\
+76 & 3.295190 & 3.241430 & 3.348950 \\
+77 & 3.299869 & 3.246044 & 3.353693 \\
+78 & 3.304547 & 3.250656 & 3.358439 \\
+79 & 3.309226 & 3.255267 & 3.363185 \\
+80 & 3.313905 & 3.259876 & 3.367934 \\
+81 & 3.318583 & 3.264483 & 3.372683 \\
+82 & 3.323262 & 3.269090 & 3.377435 \\
+83 & 3.327941 & 3.273694 & 3.382188 \\
+84 & 3.332620 & 3.278297 & 3.386942 \\
+\hline
+\end{tabular}
+\end{table}
+
+### 2.4
+The plot is represented in Figure \ref{fig:fig-total-plot}.
+```{r, fig.align='center', out.width='70%', fig.cap='\\label{fig:fig-total-plot}Fitted model together with the training data and the forecasted values.', echo=FALSE}
+knitr::include_graphics("plots/total_plot.jpeg")
 ```
+### 2.5 
+The forecast appears to be limited as it overshoots the actual values with a slope that doesn't align with the patterns, especially during the test period. The inaccuracy is further demonstrated by most forecasted values falling outside the prediction interval. All in all, this is a basic forecast, following the general trend of the data, but not seasonal shifts.
 
-
+### 2.6
+The residuals show confusing patterns, staying close to the reference line only in the middle while significantly deviating at both the beginning and end of the plot. The model assumptions seem to be violated as the errors aren't properly distributed around zero, with negative residuals indicating the forecast systematically overshoots actual values. This systematic error pattern suggests fundamental issues with the model specification rather than random noise, confirming the model assumptions are not fulfilled.
 
 ## 3 WLS - local linear trend model
 ### 3.1
@@ -123,9 +122,9 @@ $$
 $$
 
 ### 3.2
-The highest weight is for the latest time point and it is equal to $\lambda^0 = 1$. The further in the past an observation point is, the more does its weight decrease. The weight distribution is visualized in Figure 1.
+The highest weight is for the latest time point and it is equal to $\lambda^0 = 1$. The further in the past an observation point is, the more does its weight decrease. The weight distribution is visualized in Figure \ref{fig:weights}.
 
-```{r, fig.align='center', out.width='70%', fig.cap='The weights of each observation in the train dataset.', echo=FALSE}
+```{r, fig.align='center', out.width='70%', fig.cap='\\label{fig:weights}The weights of each observation in the train dataset.', echo=FALSE}
 knitr::include_graphics("plots/weights_wls.jpeg")
 ```
 
@@ -149,3 +148,22 @@ knitr::include_graphics("plots/ols_wls_prediction.jpeg")
 ## 4 Recursive estimation and optimization of $\lambda$
 
 ### 4.1
+[todo]
+
+### 4.2
+[todo]
+
+### 4.3
+[todo]
+
+### 4.4
+[todo]
+
+### 4.5
+[todo]
+
+### 4.6
+[todo]
+
+### 4.7
+[todo]
