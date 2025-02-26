@@ -276,3 +276,96 @@ legend("topright", legend=c("λ=0.7", "λ=0.99"), col=c("blue", "red"), lty=1)
 # On the other hand, a lower value of λ (e.g., 0.7) gives more weight to the most recent observations,
 # making the model more sensitive to changes in recent data and causing the estimates to fluctuate more.
 # This can lead to less stable estimates in the short term, as the model reacts strongly to recent changes.
+
+
+# 4.5
+# Function to compute one-step ahead predictions
+one_step_forecast <- function(X, Theta) {
+  n <- nrow(X)
+  y_hat <- numeric(n)
+  
+  for (t in 5:n) {
+    y_hat[t] <- sum(X[t, ] * Theta[t - 1, ])
+  }
+  return(y_hat)
+}
+
+# Predictions for both lambdas
+y_hat_lambda_1 <- one_step_forecast(X, Theta_lambda_1)
+y_hat_lambda_2 <- one_step_forecast(X, Theta_lambda_2)
+
+# Residuals for both lambdas
+residuals_lambda_1 <- y_hat_lambda_1 - y
+residuals_lambda_2 <- y_hat_lambda_2 - y
+
+# Removing the burn-in period (those are thr first 4 points)
+t_values <- 5:n
+residuals_lambda_1 <- residuals_lambda_1[t_values]
+residuals_lambda_2 <- residuals_lambda_2[t_values]
+
+par(mfrow=c(1,1))
+plot(t_values, residuals_lambda_1, type="l", col="blue", ylim=range(c(residuals_lambda_1, residuals_lambda_2)), xlab="t", ylab="Residuals", main="One-step ahead residuals")
+lines(t_values, residuals_lambda_2, col="red")
+legend("topright", legend=c("λ=0.7", "λ=0.99"), col=c("blue", "red"), lty=1)
+
+
+# 4.6
+# Function to compute k-step-ahead predictions
+k_step_forecast <- function(X, Theta, k) {
+  n <- nrow(X)
+  y_hat_k <- rep(NA, n)
+  
+  for (t in 1:(n - k)) {
+    y_hat_k[t + k] <- sum(X[t, ] * Theta[t, ])
+  }
+  
+  return(y_hat_k)
+}
+
+# Function to compute k-step residuals
+compute_k_step_residuals <- function(y, y_hat_k, k) {
+  valid_indices <- (k + 1):length(y)
+  return(y_hat_k[valid_indices] - y[valid_indices])
+}
+
+# Function to optimize lambda across horizons k = 1,...,12
+optimize_lambda <- function(X, y, lambda_seq, k_max) {
+  rmse_vals <- matrix(NA, nrow = length(lambda_seq), ncol = k_max)
+  colnames(rmse_vals) <- paste0("k=", 1:k_max)
+  
+  for (i in seq_along(lambda_seq)) {
+    lambda <- lambda_seq[i]
+    Theta <- RLS_estimate_with_forgetting(X, y, diag(0.1, 2, 2), lambda)
+    
+    for (k in 1:k_max) {
+      y_hat_k <- k_step_forecast(X, Theta, k)
+      residuals_k <- compute_k_step_residuals(y, y_hat_k, k)
+      rmse_vals[i, k] <- sqrt(mean(residuals_k^2, na.rm = TRUE))
+    }
+  }
+  
+  return(rmse_vals)
+}
+
+# Runing the optimization over lambda
+lambda_seq <- seq(0.5, 0.99, by = 0.01)
+k_max <- 12
+rmse_results <- optimize_lambda(X, y, lambda_seq, k_max)
+
+# Dataframe for plotting
+df <- data.frame(lambda = rep(lambda_seq, k_max), 
+                 k = rep(1:k_max, each = length(lambda_seq)), 
+                 RMSE = as.vector(rmse_results))
+
+library(ggplot2)
+ggplot(df, aes(x = lambda, y = RMSE, color = factor(k))) +
+  geom_line() +
+  labs(title = "RMSE vs Lambda", x = "Lambda", y = "RMSE", color = "Horizon k") +
+  theme_minimal()
+
+
+
+
+# 4.7
+
+
