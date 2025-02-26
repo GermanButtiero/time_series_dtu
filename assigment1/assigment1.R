@@ -98,7 +98,6 @@ print(72) # for OLS -> sum of weights is equal to the number of observations
 # 3.4
 SIGMA <- diag(n)
 diag(SIGMA) <- 1/weights
-
 ## Estimate parameters with WLS
 theta_WLS <- solve(t(X)%*%solve(SIGMA)%*%X)%*%(t(X)%*%solve(SIGMA)%*%y)
 print(theta_WLS)
@@ -158,4 +157,122 @@ ggplot(Dtrain, aes(x=year, y=total)) +
 
 # Part 4 - RLS and optimization of lambda
 
-# 4.1
+# 4.2
+D <- Dtrain
+X <- cbind(1, D$year) 
+y <- D$total 
+n <-length(X[,1]) # number of observations
+
+# Initialize R0
+# We do this in order to make the matrix invertible
+p <- 2  
+R_0 <- diag(0.1, p, p)
+
+# Function to implement Recursive Least Squares (RLS)
+RLS_estimate <- function(X, y, R_0) {
+  # Number of observations and parameters
+  n <- length(y)
+  p <- ncol(X)  
+
+  # Initialize Theta matrix to store estimates
+  Theta <- matrix(NA, nrow=n, ncol=p)
+
+  # Initialize R and h
+  R <- R_0   #it allows us to make the matrix invertible
+  h <- rep(0, p)  # Initial h is a vector of zeros because theta_0 = 0
+
+  # Loop
+  for (i in 1:n) {
+    x <- X[i,]
+    y_i <- y[i]
+
+    # Update R and h
+    R <- R + x %*% t(x)  # R_t = R_{t-1} + x_t * x_t^T
+    h <- h + x * y_i  # h_t = h_{t-1} + x_t * y_t
+
+    # Estimate parameters 
+    Theta[i,] <- solve(R) %*% h  # θ_t = R_t^-1 * h_t
+  }
+
+  return(Theta)
+}
+Theta_RLS <- RLS_estimate(X, y, R_0)
+Theta_RLS[1:3,]
+
+# Do you think it is intuitive to understand the details in the
+#matrix calculations? If yes, give a short explanaition
+
+
+# 4.3
+
+#difference between estimates of OLS and RLS
+print(paste("The difference between the estimates of OLS and RLS is: ", Theta_RLS[n,1] - theta_hat[1]))
+
+#The values are very far apart from each other. This is caused by the initial value of R_0, which is set to a very low value.
+#This causes the estimates to be very different from the OLS estimates. A way to reduce this difference is to reduce the initial value of R_0. 
+#A larger R_0 will cause the estimates to be more influenced by the initial value, while a smaller R_0 will cause the estimates to be more influenced by the data.
+
+R_0 <- diag(0.001, p, p)
+Theta_RLS <- RLS_estimate(X, y, R_0)
+print(paste("The difference between the estimates of OLS and RLS is: ", Theta_RLS[n,1] - theta_hat[1]))
+
+#4.4 
+# Function to implement Recursive Least Squares (RLS) with lambda
+RLS_estimate_with_forgetting <- function(X, y, R_0, lambda) {
+  n <- length(y)  
+  p <- ncol(X)    
+  
+  # Initialize Theta, Rt, and h_t
+  Theta <- matrix(NA, nrow=n, ncol=p)
+  R <- R_0
+  h_t <- rep(0, p)  
+  
+  # Loop through each time step
+  for (t in 1:n) {
+    x_t <- X[t, ]
+    y_t <- y[t]
+    
+    # Update h_t recursively
+    h_t <- h_t + x_t * y_t
+    
+    # Update R_t with forgetting factor
+    R <- lambda * R + x_t %*% t(x_t)
+    
+    # Calculate theta_t (parameter estimates)
+    Theta[t, ] <- solve(R) %*% h_t
+  }
+  
+  return(Theta)
+}
+
+lambda_1 <- 0.7
+lambda_2 <- 0.99
+
+# Initialize R_0 
+R_0 <- diag(0.1, 2, 2)
+
+# Calculate parameter estimates for both lambdas
+Theta_lambda_1 <- RLS_estimate_with_forgetting(X, y, R_0, lambda_1)
+Theta_lambda_2 <- RLS_estimate_with_forgetting(X, y, R_0, lambda_2)
+
+# Plot the estimates
+par(mfrow=c(1,2))  
+
+# Plot for θ1
+plot(1:n, Theta_lambda_1[, 1], type="l", col="blue", ylim=range(c(Theta_lambda_1[,1], Theta_lambda_2[,1])), xlab="t", ylab="θ1", main="Estimates of θ1")
+lines(1:n, Theta_lambda_2[, 1], col="red")
+legend("topright", legend=c("λ=0.7", "λ=0.99"), col=c("blue", "red"), lty=1)
+
+# Plot for θ2
+plot(1:n, Theta_lambda_1[, 2], type="l", col="blue", ylim=range(c(Theta_lambda_1[,2], Theta_lambda_2[,2])), xlab="t", ylab="θ2", main="Estimates of θ2")
+lines(1:n, Theta_lambda_2[, 2], col="red")
+legend("topright", legend=c("λ=0.7", "λ=0.99"), col=c("blue", "red"), lty=1)
+
+# The estimates of θ1 and θ2 are more stable when using a higher value of λ.
+# This is because a higher value of λ gives more weight to past observations,
+# making the model less sensitive to recent fluctuations in the data.
+# As a result, the estimates are smoother and more stable over time.
+
+# On the other hand, a lower value of λ (e.g., 0.7) gives more weight to the most recent observations,
+# making the model more sensitive to changes in recent data and causing the estimates to fluctuate more.
+# This can lead to less stable estimates in the short term, as the model reacts strongly to recent changes.
