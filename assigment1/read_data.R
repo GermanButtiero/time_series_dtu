@@ -1,7 +1,7 @@
 ### Read training data
 #! Perhaps you need to set the working directory!?
 setwd("Assignment1")
-D <- read.csv("DST_BIL54.csv")
+D <- read.csv("/Users/katarina/Documents/GitHub/time_series_dtu/assigment1/DST_BIL54.csv")
 str(D)
 
 # See the help

@@ -160,14 +160,14 @@ knitr::include_graphics("plots/ols_wls_prediction.jpeg")
 [todo]
 
 ### 4.5
-```{r, fig.align='center', out.width='70%', fig.cap='', echo=FALSE}
-knitr::include_graphics("plots/one_step_pred.png")
+```{r, fig.align='center', out.width='50%', fig.cap='', echo=FALSE}
+knitr::include_graphics("plots/one_step_ahead_pred.svg")
 ```
 
 The plot above shows the one-step-ahead residuals for $\lambda = 0.7$ in blue and $\lambda = 0.99$ in red. The residuals represent the difference between predicted and actual values at each time step. For $\lambda = 0.99$, the residuals are stable, showing that the model is more resistant to any recent fluctuations because of the higher weight given to past observations. In contrast, for $\lambda = 0.7$, the residuals diverge a lot more, suggesting that the model reacts stronger to recent data. This clearly shows how the choice of $\lambda$ affects the stability and adaptability of the recursive estimation process.
 
 ### 4.6
-```{r, fig.align='center', out.width='70%', fig.cap='', echo=FALSE}
+```{r, fig.align='center', out.width='50%', fig.cap='', echo=FALSE}
 knitr::include_graphics("plots/rmse_lambda.png")
 ```
 
@@ -177,7 +177,7 @@ The relationship between the forgetting factor $\lambda$ and the Root Mean Squar
 [todo]
 
 ### 4.8
-Time adaptive models are very useful for tracking changes of a dynamic system. However, they also come with a set of challenges that should be carefully considered or managed. One concern is to balance adaptation speed with stability. If $\lamda$ is too small, the model relies on recent data which makes is very sensitive to fluctuations and noise. On the other hand, if $\lamda$ is too high, our older data will have a stronger imact which then makes the model unresponsive to new trends. In other words, our model overfits or underfits and selecting the right $\lambda$ value is crucial for good generalization.
+Time adaptive models are very useful for tracking changes of a dynamic system. However, they also come with a set of challenges that should be carefully considered or managed. One concern is to balance adaptation speed with stability. If $\lambda$ is too small, the model relies on recent data which makes is very sensitive to fluctuations and noise. On the other hand, if $\lambda$ is too high, our older data will have a stronger imact which then makes the model unresponsive to new trends. In other words, our model overfits or underfits and selecting the right $\lambda$ value is crucial for good generalization.
 
 Time dependent data also introduces autocorrelation which makes cross-validation less effective. This is because splitting data randomly leads to data leakage where future data influences past predictions. Instead, time dependent data requires sequential train-test splits such as rolling windows that make for a more realistic evaluation of the model performance. 
 

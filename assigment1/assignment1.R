@@ -159,20 +159,14 @@ ggplot(Dtrain, aes(x=year, y=total)) +
   coord_cartesian(xlim = c(2018,2025))
 
 
+
 # Part 5: Recursive Estimation and Optimization of lambda
 
 # 5.2
-D <- Dtrain
-X <- cbind(1, D$year) 
-y <- D$total 
-n <-length(X[,1]) # number of observations
-
-## Initialize R0
-## We do this in order to make the matrix invertible
-p <- 2  
+# Initialize R0 - we do this in order to make the matrix invertible
 R_0 <- diag(0.1, p, p)
 
-## Function to implement Recursive Least Squares (RLS)
+# Function to implement Recursive Least Squares (RLS)
 RLS_estimate <- function(X, y, R_0) {
   # Number of observations and parameters
   n <- length(y)
@@ -289,7 +283,7 @@ one_step_forecast <- function(X, Theta) {
   y_hat <- numeric(n)
   
   for (t in 5:n) {
-    y_hat[t] <- sum(X[t, ] * Theta[t - 1, ])
+    y_hat[t] <- sum(X[t, ] %*% Theta[t - 1, ])
   }
   return(y_hat)
 }
@@ -302,7 +296,7 @@ y_hat_lambda_2 <- one_step_forecast(X, Theta_lambda_2)
 residuals_lambda_1 <- y_hat_lambda_1 - y
 residuals_lambda_2 <- y_hat_lambda_2 - y
 
-## Removing the burn-in period (those are thr first 4 points)
+## Removing the burn-in period (those are the first 4 points)
 t_values <- 5:n
 residuals_lambda_1 <- residuals_lambda_1[t_values]
 residuals_lambda_2 <- residuals_lambda_2[t_values]
@@ -314,25 +308,24 @@ legend("topright", legend=c("λ=0.7", "λ=0.99"), col=c("blue", "red"), lty=1)
 
 
 # 5.6
-## Function to compute k-step-ahead predictions
+# Function to compute k-step-ahead predictions
 k_step_forecast <- function(X, Theta, k) {
   n <- nrow(X)
-  y_hat_k <- rep(NA, n)
+  y_hat <- numeric(n)
   
-  for (t in 1:(n - k)) {
-    y_hat_k[t + k] <- sum(X[t, ] * Theta[t, ])
+  for (t in 1:k) {
+    y_hat[t+k] <- sum(X[t+k, ] %*% Theta[t, ])
   }
-  
-  return(y_hat_k)
+  return(y_hat)
 }
 
-## Function to compute k-step residuals
+# Function to compute k-step residuals
 compute_k_step_residuals <- function(y, y_hat_k, k) {
   valid_indices <- (k + 1):length(y)
   return(y_hat_k[valid_indices] - y[valid_indices])
 }
 
-## Function to optimize lambda across horizons k = 1,...,12
+# Function to optimize lambda across horizons k = 1,...,12
 optimize_lambda <- function(X, y, lambda_seq, k_max) {
   rmse_vals <- matrix(NA, nrow = length(lambda_seq), ncol = k_max)
   colnames(rmse_vals) <- paste0("k=", 1:k_max)
@@ -351,12 +344,13 @@ optimize_lambda <- function(X, y, lambda_seq, k_max) {
   return(rmse_vals)
 }
 
-## Running the optimization over lambda
+
+# Running the optimization over lambda
 lambda_seq <- seq(0.5, 0.99, by = 0.01)
 k_max <- 12
 rmse_results <- optimize_lambda(X, y, lambda_seq, k_max)
-
-## Dataframe for plotting
+rmse_results
+# Dataframe for plotting
 df <- data.frame(lambda = rep(lambda_seq, k_max), 
                  k = rep(1:k_max, each = length(lambda_seq)), 
                  RMSE = as.vector(rmse_results))
@@ -370,3 +364,35 @@ ggplot(df, aes(x = lambda, y = RMSE, color = factor(k))) +
 
 # 5.7
 
+k_step_forecast <- function(X, Theta, k) {
+  n <- nrow(X)
+  y_hat <- numeric(n)
+  
+  for (t in 1:k) {
+    y_hat[t] <- sum(X[t, ] %*% Theta[72, ])
+  }
+  return(y_hat)
+}
+
+Theta <- RLS_estimate_with_forgetting(X, y, diag(0.1, 2, 2), 0.99)
+
+RLS_with_horizon <- function(X_test, Theta) {
+  for (k in 1:12) {
+    y_hat_k <- k_step_forecast(X_test, Theta, k)
+  }
+  return(y_hat_k)
+}
+
+Theta[72, ]
+RLS <- RLS_with_horizon(X_test, Theta)
+RLS
+Dtest$y_pred_rls <- RLS
+
+
+ggplot(Dtest, aes(x=year, y=total)) +
+  
+  geom_point(aes(x=year,y=forecast[,1]), col="green", size=5) +
+  
+  geom_point(aes(x=year,y=y_pred_wls), col="blue", size=5) +
+  
+  geom_point(aes(x=year,y=y_pred_rls), col="black", size=5) 

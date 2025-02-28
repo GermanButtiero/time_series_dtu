@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.2.21)  26 FEB 2025 12:29
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.2.21)  28 FEB 2025 14:56
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -309,7 +309,8 @@ File: t1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 File: l3backend-pdftex.def 2024-05-08 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count298
 \l__pdf_internal_box=\box54
-) (./report.aux)
+)
+No file report.aux.
 \openout1 = `report.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 72.
@@ -420,7 +421,13 @@ File: plots/estimated_mean.png Graphic file (type png)
 <use plots/estimated_mean.png>
 Package pdftex.def Info: plots/estimated_mean.png  used on input line 138.
 (pdftex.def)             Requested size: 328.8337pt x 231.11826pt.
-<plots/total_plot.jpeg, id=9, 1027.84pt x 587.19376pt>
+
+LaTeX Warning: Reference `tab:forecast-results' on page 1 undefined on input line 147.
+
+
+LaTeX Warning: Reference `fig:fig-total-plot' on page 1 undefined on input line 175.
+
+<plots/total_plot.jpeg, id=7, 1027.84pt x 587.19376pt>
 File: plots/total_plot.jpeg Graphic file (type jpg)
 <use plots/total_plot.jpeg>
 Package pdftex.def Info: plots/total_plot.jpeg  used on input line 179.
@@ -434,7 +441,10 @@ Package pdftex.def Info: plots/total_plot.jpeg  used on input line 179.
 [2 <./plots/estimated_mean.png>]
 
 [3 <./plots/total_plot.jpeg>]
-<plots/weights_wls.jpeg, id=52, 1027.84pt x 587.19376pt>
+
+LaTeX Warning: Reference `fig:weights' on page 4 undefined on input line 238.
+
+<plots/weights_wls.jpeg, id=49, 1027.84pt x 587.19376pt>
 File: plots/weights_wls.jpeg Graphic file (type jpg)
 <use plots/weights_wls.jpeg>
 Package pdftex.def Info: plots/weights_wls.jpeg  used on input line 242.
@@ -442,34 +452,27 @@ Package pdftex.def Info: plots/weights_wls.jpeg  used on input line 242.
 
 
 [4{/Users/katarina/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc} <./plots/weights_wls.jpeg>]
-<plots/ols_wls_prediction.jpeg, id=68, 1027.84pt x 587.19376pt>
+<plots/ols_wls_prediction.jpeg, id=65, 1027.84pt x 587.19376pt>
 File: plots/ols_wls_prediction.jpeg Graphic file (type jpg)
 <use plots/ols_wls_prediction.jpeg>
 Package pdftex.def Info: plots/ols_wls_prediction.jpeg  used on input line 270.
 (pdftex.def)             Requested size: 328.82141pt x 187.85208pt.
 
+! LaTeX Error: File `plots/one_step_ahead_pred' not found.
 
-[5 <./plots/ols_wls_prediction.jpeg>]
-
-[6] (./report.aux)
- ***********
-LaTeX2e <2024-11-01> patch level 2
-L3 programming layer <2025-01-18>
- ***********
- ) 
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.300 ...0.5\linewidth]{plots/one_step_ahead_pred}
+                                                   
 Here is how much of TeX's memory you used:
- 11166 strings out of 475172
- 172178 string characters out of 5765189
- 576408 words of memory out of 5000000
- 33963 multiletter control sequences out of 15000+600000
+ 11145 strings out of 475172
+ 172586 string characters out of 5765189
+ 574860 words of memory out of 5000000
+ 33957 multiletter control sequences out of 15000+600000
  598888 words of font info for 73 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 89i,12n,93p,667b,464s stack positions out of 10000i,1000n,20000p,200000b,200000s
-</Users/katarina/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></Users/katarina/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></Users/katarina/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmex10.pfb></Users/katarina/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi10.pfb></Users/katarina/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi12.pfb></Users/katarina/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi5.pfb></Users/katarina/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi7.pfb></Users/katarina/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb></Users/katarina/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr12.pfb></Users/katarina/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb></Users/katarina/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr5.pfb></Users/katarina/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr7.pfb></Users/katarina/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></Users/katarina/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy5.pfb></Users/katarina/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy7.pfb>
-Output written on report.pdf (6 pages, 394117 bytes).
-PDF statistics:
- 239 PDF objects out of 1000 (max. 8388607)
- 191 compressed objects within 2 object streams
- 39 named destinations out of 1000 (max. 500000)
- 210 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 89i,12n,93p,349b,464s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
+!  ==> Fatal error occurred, no output PDF file produced!
