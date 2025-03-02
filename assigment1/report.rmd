@@ -25,6 +25,10 @@ There seems to be a general positive trend of number of vehicles in Denmark over
 
 #### 2.1
 [todo] [for each member]
+```{r, fig.align='center', out.width='70%', fig.cap='\\label{fig:ger21}s243660', echo=FALSE}
+knitr::include_graphics("plots/21ger.png")
+```
+
 $$
 y = \begin{bmatrix}
 2.930 \\
@@ -153,7 +157,10 @@ knitr::include_graphics("plots/ols_wls_prediction.jpeg")
 ## 5 Recursive estimation and optimization of $\lambda$
 
 ### 5.1
-[todo]
+```{r, fig.align='center', out.width='70%', fig.cap='\\label{fig:ger51}s243660', echo=FALSE}
+knitr::include_graphics("plots/51ger.png")
+```
+
 
 ### 5.2
 $$
