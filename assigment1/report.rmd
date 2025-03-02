@@ -26,20 +26,6 @@ There seems to be a general positive trend of number of vehicles in Denmark over
 #### 2.1
 The pictures are shown in [Appendix](#appendix).
 
-$$
-y = \begin{bmatrix}
-2.930 \\
-2.934 \\
-2.941
-\end{bmatrix},
-\quad
-X = \begin{bmatrix}
-1 & 2018.000 \\
-1 & 2018.083 \\
-1 & 2018.167
-\end{bmatrix}
-$$
-
 ### 3 OLS - global linear trend model
 #### 3.1
 We can estimate the parameters by solving the normal equation $\theta = (X^T X)^{-1} X^T y$.
@@ -156,7 +142,6 @@ knitr::include_graphics("plots/ols_wls_prediction.jpeg")
 #### 5.1
 The pictures are shown in [Appendix](#appendix).
 
-
 #### 5.2
 $$
 \hat{\theta}_1 = \begin{pmatrix} 7.196 \times 10^{-7} & 0.001452 \end{pmatrix}
@@ -206,12 +191,20 @@ An alternative technique for adaptive estimation is the long short-term memory n
 
 ### Appendix 
 #### 2.1
-```{r, fig.align='center', out.width='70%', fig.cap='\\label{fig:ger21}s243660', echo=FALSE}
+```{r, fig.align='center', out.width='40%', fig.cap='\\label{fig:ger21}s243660', echo=FALSE}
 knitr::include_graphics("plots/21ger.png")
 ```
 
+```{r, fig.align='center', out.width='40%', fig.cap='\\label{fig:hub21}s243896', echo=FALSE}
+knitr::include_graphics("plots/21hub.png")
+```
 #### 5.1
 
-```{r, fig.align='center', out.width='70%', fig.cap='\\label{fig:ger51}s243660', echo=FALSE}
+```{r, fig.align='center', out.width='40%', fig.cap='\\label{fig:ger51}s243660', echo=FALSE}
 knitr::include_graphics("plots/51ger.png")
 ```
+
+```{r, fig.align='center', out.width='40%', fig.cap='\\label{fig:hub51}s243896', echo=FALSE}
+knitr::include_graphics("plots/51hub.png")
+```
+
