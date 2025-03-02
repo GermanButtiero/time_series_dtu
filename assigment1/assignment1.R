@@ -391,7 +391,7 @@ Dtest$y_pred_rls <- RLS
 
 ggplot(Dtest, aes(x=year, y=total)) +
   
-  geom_point(aes(x=year,y=forecast[,1]), col="green", size=5) +
+  geom_point(aes(x=year,y=forecast[,1]), col="red", size=5) +
   
   geom_point(aes(x=year,y=y_pred_wls), col="blue", size=5) +
   

@@ -90,7 +90,7 @@ The forecast appears to be limited as it overshoots the actual values with a slo
 The residuals show confusing patterns, staying close to the reference line only in the middle while significantly deviating at both the beginning and end of the plot. The model assumptions seem to be violated as the errors aren't properly distributed around zero, with negative residuals indicating the forecast systematically overshoots actual values. This systematic error pattern suggests fundamental issues with the model specification rather than random noise, confirming the model assumptions are not fulfilled.
 
 
-### 4 WLS - local linear trend model [new]
+### 4 WLS - local linear trend model
 #### 4.1
 The variance-covariance matrix for the local model consists of the inverse of observation weights in the diagonal and zeros otherwise. $N$ is equal to the number of observation, which is equal to $72$.
 $$
@@ -129,11 +129,12 @@ The sum of weights for the local model is $\sum_{n=1}^{N} \lambda^{n-1} = 9.9949
 According to the local model with $\lambda = 0.9$, the parameters are equal to $\theta_1=-52.4828617$ and $\theta_2=0.0275299$.
 
 #### 4.5 
-The WLS model prioritizes recent data points, creating a more gradual slope that adapts to current trends. 
+Figure \ref{fig:OLSandWLS} shows the predictions made by OLS and WLS in red and blue respectively, along with the true predictions shown in black. 
+From this, it can be seen that the WLS model prioritizes recent data points, creating a more gradual slope that adapts to current trends. 
 While OLS treats all data equally and provides a generalized fit, WLS gives higher weight to recent observations. 
 We would choose WLS when new predictions are crucial, and OLS when analyzing from a long-term perspective.
 
-```{r, fig.align='center', out.width='70%', fig.cap='The observations as well as the predictions for the OLS \\& WLS models, including prediction intervals.', echo=FALSE}
+```{r, fig.align='center', out.width='70%', fig.cap='\\label{fig:OLSandWLS}The observations as well as the predictions for the OLS \\& WLS models, including prediction intervals.', echo=FALSE}
 knitr::include_graphics("plots/ols_wls_prediction.jpeg")
 ```
 
@@ -155,7 +156,7 @@ The matrix calculations in RLS seem intuitive as they represent an iterative upd
 The estimates of $\hat{\theta}_N$ and the OLS estimates are very far apart, with a difference of 104.81 for the first parameter. This is caused by the initial value of  $R_0$ being too low. Surprisingly, reducing $R_0$ to 0.001 made the difference even worse. A larger $R_0$ would cause the estimates to be more influenced by the initial value, helping the RLS algorithm to converge faster to the OLS estimates.
 
 #### 5.4
-The parameters are represented in figure \ref{fig:param-estimates-thetas}. The estimates of $\theta_1$ and $\theta_2$ show better stability with higher $\lambda$ values. Higher $\lambda$ places more emphasis on past observations. This results in smoother and more stable parameter estimates over time.
+The parameters are represented in Figure \ref{fig:param-estimates-thetas}. The estimates of $\theta_1$ and $\theta_2$ show better stability with higher $\lambda$ values. Higher $\lambda$ places more emphasis on past observations. This results in smoother and more stable parameter estimates over time.
 ```{r, fig.align='center', out.width='70%', fig.cap='\\label{fig:param-estimates-thetas}Parameter estimates for RLS with forgetting, with theta 1 on the left, and theta 2 on the right.', echo=FALSE}
 knitr::include_graphics("plots/theta1_theta2.png")
 ```
@@ -168,14 +169,14 @@ knitr::include_graphics("plots/theta1_theta2.png")
 The plot in Figure \ref{fig:one-step-ahead} shows the one-step-ahead residuals for $\lambda = 0.7$ in blue and $\lambda = 0.99$ in red. The residuals represent the difference between predicted and actual values at each time step. For $\lambda = 0.99$, the residuals are stable, showing that the model is more resistant to any recent fluctuations because of the higher weight given to past observations. In contrast, for $\lambda = 0.7$, the residuals diverge a lot more, suggesting that the model reacts stronger to recent data. This clearly shows how the choice of $\lambda$ affects the stability and adaptability of the recursive estimation process.
 
 #### 5.6
-```{r, fig.align='center', out.width='50%', fig.cap='RMSE vs Lambda', echo=FALSE}
+```{r, fig.align='center', out.width='50%', fig.cap='\\label{fig:RMSEvslambda}RMSE vs Lambda', echo=FALSE}
 knitr::include_graphics("plots/rmse_lambda.png")
 ```
 
-The relationship between the forgetting factor $\lambda$ and the Root Mean Square Error (RMSE) across different forecast horizons ($k = 1, \dots, 12$) is shown. A clear trend can be noticed where RMSE decreases as $\lambda$ approaches $1$, meaning that a higher $\lambda$ results in lower prediction errors. However, for lower values of $\lambda$, the RMSE is much higher, which could mean that too much "forgetting" doesn't gives optimal predictions. These results would then suggest that the optimal choice of $\lambda$ lies within the range of 0.8 to 0.99, where RMSE is minimized. Moreover, since the RMSE patterns are the same across all horizons, I would use a single optimal $\lambda$ rather than letting it depend on the horizon.  
+The relationship between the forgetting factor $\lambda$ and the Root Mean Square Error (RMSE) across different forecast horizons ($k = 1, \dots, 12$) is shown in Figure \ref{fig:RMSEvslambda}. A clear trend can be noticed where RMSE decreases as $\lambda$ approaches $1$, meaning that a higher $\lambda$ results in lower prediction errors. However, for lower values of $\lambda$, the RMSE is much higher, which could mean that too much "forgetting" doesn't gives optimal predictions. These results would then suggest that the optimal choice of $\lambda$ lies within the range of 0.8 to 0.99, where RMSE is minimized. Moreover, since the RMSE patterns are the same across all horizons, I would use a single optimal $\lambda$ rather than letting it depend on the horizon.  
 
 #### 5.7
-The forecasts are represented in Figure \ref{fig:forecasts-models}.
+For $\lambda = 0.99$, the forecasts are represented in Figure \ref{fig:forecasts-models}, with the red points being OLS predictions, blue being WLS, and black being RLS.
 ```{r, fig.align='center', out.width='30%', fig.cap='\\label{fig:forecasts-models}Forecasts for OLS, WLS, and RLS.', echo=FALSE}
 knitr::include_graphics("plots/ggpoints.png")
 ```
@@ -198,6 +199,10 @@ knitr::include_graphics("plots/21ger.png")
 ```{r, fig.align='center', out.width='40%', fig.cap='\\label{fig:hub21}s243896', echo=FALSE}
 knitr::include_graphics("plots/21hub.png")
 ```
+
+```{r, fig.align='center', out.width='50%', fig.cap='\\label{fig:keer21}s243933', echo=FALSE}
+knitr::include_graphics("plots/2_1keerthi.jpg")
+```
 #### 5.1
 
 ```{r, fig.align='center', out.width='40%', fig.cap='\\label{fig:ger51}s243660', echo=FALSE}
@@ -208,3 +213,6 @@ knitr::include_graphics("plots/51ger.png")
 knitr::include_graphics("plots/51hub.png")
 ```
 
+```{r, fig.align='center', out.width='40%', fig.cap='\\label{fig:keer51}s243933', echo=FALSE}
+knitr::include_graphics("plots/5_1keerthi.jpg")
+```
