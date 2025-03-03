@@ -169,7 +169,7 @@ knitr::include_graphics("plots/theta1_theta2.png")
 The plot in Figure \ref{fig:one-step-ahead} shows the one-step-ahead residuals for $\lambda = 0.7$ in blue and $\lambda = 0.99$ in red. The residuals represent the difference between predicted and actual values at each time step. For $\lambda = 0.99$, the residuals are stable, showing that the model is more resistant to any recent fluctuations because of the higher weight given to past observations. In contrast, for $\lambda = 0.7$, the residuals diverge a lot more, suggesting that the model reacts stronger to recent data. This clearly shows how the choice of $\lambda$ affects the stability and adaptability of the recursive estimation process.
 
 #### 5.6
-```{r, fig.align='center', out.width='50%', fig.cap='\\label{fig:RMSEvslambda}RMSE vs Lambda', echo=FALSE}
+```{r, fig.align='center', out.width='70%', fig.cap='\\label{fig:RMSEvslambda}RMSE vs Lambda', echo=FALSE}
 knitr::include_graphics("plots/rmse_lambda.png")
 ```
 
@@ -177,7 +177,7 @@ The relationship between the forgetting factor $\lambda$ and the Root Mean Squar
 
 #### 5.7
 For $\lambda = 0.99$, the forecasts are represented in Figure \ref{fig:forecasts-models}, with the red points being OLS predictions, blue being WLS, and black being RLS.
-```{r, fig.align='center', out.width='30%', fig.cap='\\label{fig:forecasts-models}Forecasts for OLS, WLS, and RLS.', echo=FALSE}
+```{r, fig.align='center', out.width='40%', fig.cap='\\label{fig:forecasts-models}Forecasts for OLS, WLS, and RLS.', echo=FALSE}
 knitr::include_graphics("plots/ggpoints.png")
 ```
 

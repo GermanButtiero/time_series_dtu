@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.2.21)  3 MAR 2025 15:09
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.2.21)  3 MAR 2025 15:18
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -458,16 +458,16 @@ File: plots/one_step_ahead_pred.png Graphic file (type png)
 <use plots/one_step_ahead_pred.png>
 Package pdftex.def Info: plots/one_step_ahead_pred.png  used on input line 332.
 (pdftex.def)             Requested size: 328.82901pt x 263.0632pt.
-<plots/rmse_lambda.png, id=86, 821.0675pt x 997.7275pt>
+<plots/rmse_lambda.png, id=86, 1180.41pt x 843.15pt>
 File: plots/rmse_lambda.png Graphic file (type png)
 <use plots/rmse_lambda.png>
 Package pdftex.def Info: plots/rmse_lambda.png  used on input line 354.
-(pdftex.def)             Requested size: 234.87114pt x 285.40575pt.
+(pdftex.def)             Requested size: 328.81946pt x 234.87103pt.
 <plots/ggpoints.png, id=89, 400.49625pt x 601.24625pt>
 File: plots/ggpoints.png Graphic file (type png)
 <use plots/ggpoints.png>
 Package pdftex.def Info: plots/ggpoints.png  used on input line 382.
-(pdftex.def)             Requested size: 140.92744pt x 211.56776pt.
+(pdftex.def)             Requested size: 187.90326pt x 282.09036pt.
 
 
 [5 <./plots/ols_wls_prediction.jpeg>]
@@ -489,7 +489,7 @@ Package pdftex.def Info: plots/21hub.png  used on input line 432.
 File: plots/2_1keerthi.jpg Graphic file (type jpg)
 <use plots/2_1keerthi.jpg>
 Package pdftex.def Info: plots/2_1keerthi.jpg  used on input line 441.
-(pdftex.def)             Requested size: 187.89204pt x 57.28098pt.
+(pdftex.def)             Requested size: 234.8692pt x 71.60248pt.
 <plots/2_1_katarina.jpg, id=118, 881.2925pt x 545.03625pt>
 File: plots/2_1_katarina.jpg Graphic file (type jpg)
 <use plots/2_1_katarina.jpg>
@@ -538,7 +538,7 @@ Here is how much of TeX's memory you used:
  14 hyphenation exceptions out of 8191
  89i,12n,93p,666b,469s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </Users/katarina/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></Users/katarina/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmex10.pfb></Users/katarina/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi10.pfb></Users/katarina/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi5.pfb></Users/katarina/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi7.pfb></Users/katarina/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb></Users/katarina/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr12.pfb></Users/katarina/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb></Users/katarina/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr5.pfb></Users/katarina/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr7.pfb></Users/katarina/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></Users/katarina/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy5.pfb></Users/katarina/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy7.pfb>
-Output written on report.pdf (11 pages, 3779002 bytes).
+Output written on report.pdf (11 pages, 3759379 bytes).
 PDF statistics:
  250 PDF objects out of 1000 (max. 8388607)
  182 compressed objects within 2 object streams
