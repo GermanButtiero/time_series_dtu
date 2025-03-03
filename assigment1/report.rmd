@@ -192,6 +192,7 @@ An alternative technique for adaptive estimation is the long short-term memory n
 
 ### Appendix 
 #### 2.1
+
 ```{r, fig.align='center', out.width='40%', fig.cap='\\label{fig:ger21}s243660', echo=FALSE}
 knitr::include_graphics("plots/21ger.png")
 ```
@@ -203,6 +204,11 @@ knitr::include_graphics("plots/21hub.png")
 ```{r, fig.align='center', out.width='50%', fig.cap='\\label{fig:keer21}s243933', echo=FALSE}
 knitr::include_graphics("plots/2_1keerthi.jpg")
 ```
+
+```{r, fig.align='center', out.width = '60%', fig.cap='\\label{fig:kata21}s243906', echo=FALSE}
+knitr::include_graphics("plots/2_1_katarina.jpg")
+```
+
 #### 5.1
 
 ```{r, fig.align='center', out.width='40%', fig.cap='\\label{fig:ger51}s243660', echo=FALSE}
@@ -215,4 +221,8 @@ knitr::include_graphics("plots/51hub.png")
 
 ```{r, fig.align='center', out.width='40%', fig.cap='\\label{fig:keer51}s243933', echo=FALSE}
 knitr::include_graphics("plots/5_1keerthi.jpg")
+```
+
+```{r, fig.align='center', out.width='60%', fig.cap='\\label{fig:kata51}s243906', echo=FALSE}
+knitr::include_graphics("plots/5_1_katarina.jpg")
 ```
