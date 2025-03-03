@@ -10,6 +10,8 @@ date: "2025-02-21"
 
 #### Group members: Keerthi (s243933), Katarina (s243906), Hubert (s243896), German (s243660)
 
+The code repo can be found under this **[link](https://github.com/GermanButtiero/time_series_dtu)**.
+
 
 ### 1 Plot data
 
@@ -191,7 +193,6 @@ Recursive estimation helps with challenges with test sets for time dependent dat
 An alternative technique for adaptive estimation is the long short-term memory network that is designed to capture temporal dependencies and adapt over time.
 
 ### Appendix 
-#### 2.1
 
 ```{r, fig.align='center', out.width='40%', fig.cap='\\label{fig:ger21}s243660', echo=FALSE}
 knitr::include_graphics("plots/21ger.png")
@@ -208,8 +209,6 @@ knitr::include_graphics("plots/2_1keerthi.jpg")
 ```{r, fig.align='center', out.width = '60%', fig.cap='\\label{fig:kata21}s243906', echo=FALSE}
 knitr::include_graphics("plots/2_1_katarina.jpg")
 ```
-
-#### 5.1
 
 ```{r, fig.align='center', out.width='40%', fig.cap='\\label{fig:ger51}s243660', echo=FALSE}
 knitr::include_graphics("plots/51ger.png")
