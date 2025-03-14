@@ -1,6 +1,13 @@
-#2. Simulating seasonal processes 
 library(astsa)
+library(httpgd)
+# Open server to view plots
+hgd()
 
+#1.4 Plot ACF up to k=30 for \phi_1 = -0.7 and \phi_2 = -0.2
+x <- arima.sim(n=200, model=list(order=c(2,0,0), ar=c(-0.7, -0.2)))
+acf(x, lag.max=30, lwd=2)
+
+#2. Simulating seasonal processes 
 n <- 300
 
 plotit <- function(x){
