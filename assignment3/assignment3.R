@@ -90,4 +90,10 @@ plotit <- function(df, filename="plot2.1.png") {
 }
 plotit(df, "plot3.2.png")
 
-
+#2.4
+#Comment: would you trust the forecast? Do you think the prediction intervals have correct
+#Since the AR(1) model only accounts for the immediate past (time t-1) and does not consider 
+#long-term patterns like seasonality, we cannot fully trust the forecast, especially for 
+#longer horizons. The plot supports this, as the prediction intervals widen significantly 
+#after the first few observations, reflecting the increasing uncertainty in the forecast as
+# we move further from the observed data.
