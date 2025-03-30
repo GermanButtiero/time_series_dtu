@@ -1,0 +1,43 @@
+---
+title: "Assignment 3"
+output:
+  pdf_document: default
+  fig_caption: yes
+  html_document:
+    df_print: paged
+date: "2025-04-21"
+---
+
+#### Group members: Keerthi (s243933), Katarina (s243906), Hubert (s243896), German (s243660)
+
+The code repo can be found under this **[link](https://github.com/GermanButtiero/time_series_dtu)**.
+
+
+#### 2.1
+
+Introducing \( X_t = \log(Y_t) - \mu \), transforms the given Seasonal Autoregressive (AR) model into:
+
+\[
+(1 + \phi_1 B)(1 + \Phi_1 B^{12}) X_t = \varepsilon_t
+\]
+
+Expanding the terms:
+
+\[
+(1 + (-0.38)B)(1 + (-0.94)B^{12}) X_t = \varepsilon_t
+\]
+
+\[
+(1 - 0.38 B - 0.94 B^{12} + 0.3572 B^{13}) X_t = \varepsilon_t
+\]
+
+Rewriting in terms of \( X_t \):
+
+\[
+X_t - 0.38 X_{t-1} - 0.94 X_{t-12} + 0.3572 X_{t-13} = \varepsilon_t
+\]
+
+\[
+X_t = 0.38 X_{t-1} + 0.94 X_{t-12} - 0.3572 X_{t-13} + \varepsilon_t
+\]
+
