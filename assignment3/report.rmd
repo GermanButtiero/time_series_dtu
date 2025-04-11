@@ -15,29 +15,24 @@ The code repo can be found under this **[link](https://github.com/GermanButtiero
 
 #### 2.1
 
-Introducing \( X_t = \log(Y_t) - \mu \), transforms the given Seasonal Autoregressive (AR) model into:
-
-\[
-(1 + \phi_1 B)(1 + \Phi_1 B^{12}) X_t = \varepsilon_t
-\]
-
+Introducing ( X_t = \log(Y_t) - \mu ), transforms the given Seasonal Autoregressive (AR) model into:
+[ (1 + \phi_1 B)(1 + \Phi_1 B^{12}) X_t = \varepsilon_t ]
 Expanding the terms:
+[ (1 + (-0.38)B)(1 + (-0.94)B^{12}) X_t = \varepsilon_t ]
+[ (1 - 0.38 B - 0.94 B^{12} + 0.3572 B^{13}) X_t = \varepsilon_t ]
+Rearranging to isolate the residuals:
+[ \varepsilon_t = X_t - 0.38 X_{t-1} - 0.94 X_{t-12} + 0.3572 X_{t-13} ]
 
-\[
-(1 + (-0.38)B)(1 + (-0.94)B^{12}) X_t = \varepsilon_t
-\]
+To calculate the residuals, we shift the time index forward by one:
+[ \hat{\varepsilon}{t+1|t} = X{t+1} - 0.38 X_t - 0.94 X_{t-11} + 0.3572 X_{t-12} ]
 
-\[
-(1 - 0.38 B - 0.94 B^{12} + 0.3572 B^{13}) X_t = \varepsilon_t
-\]
+For model validation, we analyzed these residuals to check the i.i.d. assumptions:
 
-Rewriting in terms of \( X_t \):
+Mean and Variance: The residuals had a mean of 0.0134 (very close to zero) and variance of 0.0442 (close to the expected value of 0.0484).
+Independence: The ACF plot showed all autocorrelations within the significance bounds, indicating no significant correlation structure remaining in the residuals.
+```{r, fig.cap="Your caption here", echo=FALSE}
+knitr::include_graphics("histogram_residuals.png")
+```
+Moreover, we tested for Shapiro-Wilk, which yielded a p-value of 0.1516 > 0.05, meaning we cannot reject the null hypothesis that the residuals are normally distributed. 
 
-\[
-X_t - 0.38 X_{t-1} - 0.94 X_{t-12} + 0.3572 X_{t-13} = \varepsilon_t
-\]
-
-\[
-X_t = 0.38 X_{t-1} + 0.94 X_{t-12} - 0.3572 X_{t-13} + \varepsilon_t
-\]
-
+These results support the conclusion that the residuals satisfy the i.i.d. assumptions, validating our specified seasonal AR model as an appropriate representation of the solar power plant data.
