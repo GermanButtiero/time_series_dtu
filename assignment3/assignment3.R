@@ -147,8 +147,8 @@ plotit(df, "plot3.2.png")
 
 #2.4
 #Comment: would you trust the forecast? Do you think the prediction intervals have correct
-#Since the AR(1) model only accounts for the immediate past (time t-1) and does not consider 
-#long-term patterns like seasonality, we cannot fully trust the forecast, especially for 
-#longer horizons. The plot supports this, as the prediction intervals widen significantly 
-#after the first few observations, reflecting the increasing uncertainty in the forecast as
-# we move further from the observed data.
+#we wouldn't fully trust this forecast. The prediction intervals are too narrow because we only 
+#used the AR(1) part to calculate them, ignoring the seasonal component.
+#While the point forecasts may be reasonable since they come from the full seasonal model,
+#the intervals don't capture all the uncertainty. The intervals do get wider for longer forecasts,
+#but they're still not wide enough to show the true range of possible outcomes.
