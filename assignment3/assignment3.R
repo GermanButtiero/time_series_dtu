@@ -39,7 +39,7 @@ dev.off()
 png("histogram_residuals.png", width=800, height=600)
 hist(residuals, breaks=30, main="Histogram of Residuals", xlab="Residuals", col="lightblue", border="black")
 dev.off()
-
+ccf(residuals, solar$xt, na.action = na.pass, main = "CCF of Residuals and X")
 png("scatter_residuals.png", width=800, height=600)
 plot(residuals, type="p", pch=16, col="blue", main="Residuals Scatter Plot", xlab="Time", ylab="Residuals")
 abline(h=0, col="red", lty=2)
