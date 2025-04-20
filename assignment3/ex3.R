@@ -1,4 +1,7 @@
-data <- read.csv("assignment3/box_data_60min.csv")
+# 3. ARX model for the heating of a box
+# Load data
+data <- read.csv("time_series_dtu/assignment3/box_data_60min.csv")
+
 #functions
 validate <- function(fit){
   if(class(fit)[1] == "lm"){
@@ -201,5 +204,67 @@ legend("topright", legend=c("AIC", "BIC"), col=c("blue", "red"), pch=19)
 cat("Best model order based on AIC:", which.min(aic_values)-1, "\n")
 cat("Best model order based on BIC:", which.min(bic_values)-1, "\n")
 
+#3.8 Plot RMSE values against model orders
 plot(x=0:max_order, y=rmse_values, type="b", col="black", pch=19, xlab="Model Order", ylab="RMSE", main="RMSE for Different Model Orders")
 
+#3.9 Multi-step predictions
+best_order <- 4
+
+# Contruct the formula for best model order
+ph_terms <- paste0("Ph.l", 1:best_order, collapse = " + ")
+tdelta_terms <- paste0("Tdelta.l", 0:(best_order - 1),  collapse = " + ")
+gv_terms <- paste0("Gv.l", 0:(best_order - 1),  collapse = " + ")
+formula_str <- paste0("Ph ~ ", ph_terms, " + ", tdelta_terms, " + ", gv_terms)
+formula_obj <- as.formula(formula_str)
+
+# Fit model with best model order with only relevant training data
+rel_cols <- c("Ph", 
+              paste0("Ph.l", 1:best_order), 
+              paste0("Tdelta.l", 0:(best_order - 1)), 
+              paste0("Gv.l", 0:(best_order - 1))
+              )
+train_subset <- na.omit(train[, rel_cols])
+model <- lm(formula_obj, data = train_subset)
+
+# Create lists for predictions
+ph_preds <- rep(NA, N)
+ph_simulated <- data$Ph
+
+# Multi-step predictions on test set
+for (i in as.numeric(rownames(test))) {
+
+  # # Skip early time steps if we don’t have enough lags
+  # print(t - best_order)
+  # if (t - best_order < 1) next
+  
+  # Get AR lags and other variables for the current time step
+  ph_vals <- ph_simulated[(i - 1):(i - best_order)]
+  tdelta_vals <- data[i, paste0("Tdelta.l", 0:(best_order - 1))]
+  gv_vals <- data[i, paste0("Gv.l", 0:(best_order - 1))]
+  
+  x_pred <- data.frame(as.list(c(
+                  setNames(as.numeric(ph_target_vals), paste0("Ph.l", 1:best_order)),
+                  setNames(as.numeric(tdelta_vals), paste0("Tdelta.l", 0:(best_order - 1))),
+                  setNames(as.numeric(gv_vals), paste0("Gv.l", 0:(best_order - 1)))
+                  )))
+  
+  # Store prediction
+  ph_preds[i] <- predict(model, newdata=x_pred)
+  
+  # Store prediction under simulated value for current time step
+  ph_simulated[i] <- ph_preds[i]
+}
+
+# Plot results from multi-step prediction
+par(mfrow = c(1, 1))
+plot(data$Ph, type = "l", col = "black", lwd = 2,
+     main = paste("Multi-step Prediction (ARX Order =", best_order, ")"),
+     xlab = "Time", ylab = "Ph")
+lines(ph_preds, col = "blue", lwd = 2, lty = 2)
+legend("topright", legend = c("Actual", "Predicted"),
+       col = c("black", "blue"), lty = c(1, 2), lwd = 2, box.lwd = 0)
+
+# The plot shows that the predictions and the actual values are very similar.
+# We think, given that there's enough data, multi-step predictions can be carried out in a real-time operational setting.
+
+#3.10
