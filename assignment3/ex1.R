@@ -1,21 +1,26 @@
 library(astsa)
+library(ggplot2)
 library(httpgd)
 # Open server to view plots
 hgd()
 
-## 1 - Stability
-# Functions
+# 1. Stability
+
+# Generate AR(2) realizations
 sim_ar2 <- function(phi1, phi2, seed = 2, n = 200, realizations = 5) {
   set.seed(seed)
+  # Create an empty matrix to store the realizations
   real_matrix <- matrix(NA, nrow = n, ncol = realizations)
+  # Populate matrix with AR(2) realizations
   for (i in 1:realizations) {
     real_matrix[, i] <- arima.sim(
-      n = n, model = list(order = c(2, 0, 0), ar = c(-phi1, -phi2))
+      n = n, model = list(order = c(2, 0, 0), ar = c(-phi1, -phi2)) # Sign is flipped accordig to implementation
     )
   }
   return(real_matrix)
 }
 
+# Plot realizations
 plot_realiz <- function(real_matrix, phi1, phi2) {
   matplot(real_matrix, type = "l", lty = 1, col = seq_len(ncol(real_matrix)),
           main = paste("AR(2) with 5 realizations",
@@ -25,27 +30,43 @@ plot_realiz <- function(real_matrix, phi1, phi2) {
          col = seq_len(ncol(real_matrix)), lty = 1, cex = 0.8)
 }
 
+# Plot empirical and theoretical ACF
 plot_acf <- function(real_matrix, phi1, phi2, lags = 30) {
+  # Get empirical ACFs of all 5 realizations
   emp_acfs <- matrix(NA, nrow = lags + 1, ncol = ncol(real_matrix))
   for (i in seq_len(ncol(real_matrix))) {
     emp_acfs[, i] <- acf(real_matrix[, i], lag.max = lags, plot = FALSE)$acf
   }
 
-  emp_acf <- rowMeans(emp_acfs)
+  # emp_acf <- rowMeans(emp_acfs)
+
+  # Get theoretical ACF of the process
   theor_acf <- ARMAacf(ar = c(-phi1, -phi2), lag.max = lags)
+  theor_acf_df <- as.data.frame(theor_acf)
+  theor_acf_df$Lag <- 0:lags
 
-  plot(emp_acf, type = "h", lty = 1, col = "blue",
-       main = paste("Empirical vs Theoretical ACF",
-                    "for phi1 =", phi1, "and phi2 =", phi2),
-       xlab = "Lag", ylab = "ACF")
+  # Plot
+  plot_df <- data.frame(Realization = character(), Lag = character(), ACF = character())
+  for (col in 1:ncol(emp_acfs)) {
+    rel_name <- paste('Realization', as.character(col), sep=" ")
+    plot_df <- rbind(plot_df, data.frame(Realization = rel_name, Lag = 0:lags, ACF = emp_acfs[, col]))
+  }
 
-  offset <- 0:(length(theor_acf) - 1)
-  segments(x0 = offset + 0.1, y0 = 0,
-           x1 = offset + 0.1, y1 = theor_acf, col = "red", lwd = 2)
-
-  legend("topright", legend = c("Empirical ACF", "Theoretical ACF"),
-         col = c("blue", "red"), lty = c(1, 1), cex = 0.8)
+  ggplot() +
+  geom_bar(data=plot_df, aes(fill=Realization, y=ACF, x=Lag), position="dodge", stat="identity", width=0.5) + 
+  geom_line(data=theor_acf_df, aes(x=Lag, y=theor_acf, color="Theoretical ACF"), stat='Identity', color="black", size=1) +
+  geom_point(data=theor_acf_df, aes(x=Lag, y=theor_acf), color="black", size=3) +
+  guides(fill = guide_legend(override.aes = list(linetype = 0))) +
+  ggtitle(paste("Theoretical vs Empirical ACFs",
+                    "for phi1 =", phi1, "and phi2 =", phi2)) +
+  theme_minimal() +
+  theme(
+        legend.title = element_blank(), 
+        plot.title = element_text(face = "bold", size = (15), hjust = 0.5)
+      )
+  
 }
+
 
 # 1.1
 phi1 <- -0.6
