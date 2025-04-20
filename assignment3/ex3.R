@@ -261,7 +261,7 @@ plot(data$Ph, type = "l", col = "black", lwd = 2,
      main = paste("Multi-step Prediction (Model Order =", best_order, ")"),
      xlab = "Time", ylab = "Ph")
 lines(ph_preds, col = "blue", lwd = 2, lty = 2)
-legend("topright", legend = c("Actual", "Predicted"),
+legend("bottomright", legend = c("Actual", "Predicted"),
        col = c("black", "blue"), lty = c(1, 2), lwd = 2, box.lwd = 0)
 
 # The plot shows that the predictions and the actual values are very similar.
