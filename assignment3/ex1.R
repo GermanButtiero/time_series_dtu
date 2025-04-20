@@ -52,18 +52,25 @@ plot_acf <- function(real_matrix, phi1, phi2, lags = 30) {
     plot_df <- rbind(plot_df, data.frame(Realization = rel_name, Lag = 0:lags, ACF = emp_acfs[, col]))
   }
 
-  ggplot() +
-  geom_bar(data=plot_df, aes(fill=Realization, y=ACF, x=Lag), position="dodge", stat="identity", width=0.5) + 
-  geom_line(data=theor_acf_df, aes(x=Lag, y=theor_acf, color="Theoretical ACF"), stat='Identity', color="black", size=1) +
-  geom_point(data=theor_acf_df, aes(x=Lag, y=theor_acf), color="black", size=3) +
-  guides(fill = guide_legend(override.aes = list(linetype = 0))) +
-  ggtitle(paste("Theoretical vs Empirical ACFs",
-                    "for phi1 =", phi1, "and phi2 =", phi2)) +
-  theme_minimal() +
-  theme(
-        legend.title = element_blank(), 
-        plot.title = element_text(face = "bold", size = (15), hjust = 0.5)
-      )
+  # ggplot()+
+  # geom_line(data = plot_df, aes(x = Lag, y = ACF, color = Realization), linewidth = 1)+
+  # geom_col(data = theor_acf_df, aes(x = Lag, y = theor_acf), fill = "black", alpha = 0.5, width = 0.4) +
+  # ggtitle(paste("Theoretical and Empirical ACFs",
+  #                   "for phi1 =", phi1, "and phi2 =", phi2)) +
+  # theme_minimal() +
+  # theme(
+  #       legend.title = element_blank(), 
+  #       plot.title = element_text(face = "bold", size = (15), hjust = 0.5)
+  #     ) 
+
+  barplot(theor_acf_df$theor_acf, names.arg = theor_acf_df$Lag, width=rep(2, lags), space=1, ylim=c(-1, 1),
+          main = paste("Theoretical and Empirical ACFs",
+                       "for phi1 =", phi1, "and phi2 =", phi2),
+          xlab = "Lag", ylab = "ACF")
+  lines(0:lags, emp_acfs[, 1], col = 1, lwd = 2)
+  for (col in seq_len(ncol(emp_acfs))) {
+    lines(0:lags, emp_acfs[, col], col = col, lwd = 2)
+  }
   
 }
 
@@ -77,22 +84,36 @@ plot_realiz(real_matrix, phi1, phi2)
 # 1.2
 plot_acf(real_matrix, phi1, phi2)
 
+
 # 1.3
 phi1 <- -0.6
 phi2 <- -0.3
-plot_acf(real_matrix, phi1, phi2)
+real_matrix <- sim_ar2(phi1, phi2)
+par(mfrow=c(2,1))
+p1 <- plot_realiz(real_matrix, phi1, phi2)
+p2 <- plot_acf(real_matrix, phi1, phi2)
+
 
 # 1.4
 phi1 <- 0.6
 phi2 <- -0.3
-plot_acf(real_matrix, phi1, phi2)
+real_matrix <- sim_ar2(phi1, phi2)
+par(mfrow=c(2,1))
+p1 <- plot_realiz(real_matrix, phi1, phi2)
+p2 <- plot_acf(real_matrix, phi1, phi2)
 
 # 1.5
 phi1 <- -0.7
 phi2 <- -0.3
-plot_acf(real_matrix, phi1, phi2)
+real_matrix <- sim_ar2(phi1, phi2)
+par(mfrow=c(2,1))
+p1 <- plot_realiz(real_matrix, phi1, phi2)
+p2 <- plot_acf(real_matrix, phi1, phi2)
 
 # 1.6
 phi1 <- -0.75
 phi2 <- -0.3
-plot_acf(real_matrix, phi1, phi2)
+real_matrix <- sim_ar2(phi1, phi2)
+par(mfrow=c(2,1))
+p1 <- plot_realiz(real_matrix, phi1, phi2)
+p2 <- plot_acf(real_matrix, phi1, phi2)
