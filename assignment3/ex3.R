@@ -258,7 +258,7 @@ for (i in as.numeric(rownames(test))) {
 # Plot results from multi-step prediction
 par(mfrow = c(1, 1))
 plot(data$Ph, type = "l", col = "black", lwd = 2,
-     main = paste("Multi-step Prediction (ARX Order =", best_order, ")"),
+     main = paste("Multi-step Prediction (Model Order =", best_order, ")"),
      xlab = "Time", ylab = "Ph")
 lines(ph_preds, col = "blue", lwd = 2, lty = 2)
 legend("topright", legend = c("Actual", "Predicted"),
