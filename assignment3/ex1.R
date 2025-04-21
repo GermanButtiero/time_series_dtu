@@ -31,7 +31,7 @@ plot_realiz <- function(real_matrix, phi1, phi2) {
 }
 
 # Plot empirical and theoretical ACF
-plot_acf <- function(real_matrix, phi1, phi2, lags = 30) {
+plot_acf <- function(real_matrix, phi1, phi2, lags = 30, alone=False) {
   # Get empirical ACFs of all 5 realizations
   emp_acfs <- matrix(NA, nrow = lags + 1, ncol = ncol(real_matrix))
   for (i in seq_len(ncol(real_matrix))) {
@@ -63,13 +63,20 @@ plot_acf <- function(real_matrix, phi1, phi2, lags = 30) {
   #       plot.title = element_text(face = "bold", size = (15), hjust = 0.5)
   #     ) 
 
-  barplot(theor_acf_df$theor_acf, names.arg = theor_acf_df$Lag, width=rep(2, lags), space=1, ylim=c(-1, 1),
+  df.bar <- barplot(theor_acf_df$theor_acf, names.arg = theor_acf_df$Lag, width=rep(1, lags), space=8, ylim=c(-1, 1),
           main = paste("Theoretical and Empirical ACFs",
                        "for phi1 =", phi1, "and phi2 =", phi2),
           xlab = "Lag", ylab = "ACF")
-  lines(0:lags, emp_acfs[, 1], col = 1, lwd = 2)
+  axis(1, at = df.bar, labels = c(0:30))
+  # lines(x=df.bar, y=emp_acfs[, 1], col = 1, lwd = 2)
   for (col in seq_len(ncol(emp_acfs))) {
-    lines(0:lags, emp_acfs[, col], col = col, lwd = 2)
+    lines(x=df.bar, y=emp_acfs[, col], col = col, lwd = 2)
+  }
+  par(lty="solid", col=1)
+  if (alone==TRUE) {
+    legend("bottomright", xjust=1, yjust=0,           
+        legend = c("Realization 1","Realization 2", "Realization 3", "Realization 4", "Realization 5"),
+        col = seq_len(ncol(emp_acfs)), pt.cex = 0.5)
   }
   
 }
@@ -82,7 +89,8 @@ real_matrix <- sim_ar2(phi1, phi2)
 plot_realiz(real_matrix, phi1, phi2)
 
 # 1.2
-plot_acf(real_matrix, phi1, phi2)
+plot_acf(real_matrix, phi1, phi2, alone=TRUE)
+
 
 
 # 1.3
