@@ -1,53 +1,54 @@
 
-kf_logLik_dt <- function(par, df) {
-  # par: vector of parameters
-  # df: data frame with observations and inputs as columns (Y, Ta, S, I)
-  # par: Could be on the form c(A11, A12, A21, A22, B11, B12, B21, B22, Q11, Q12, Q22)
-
-  A   <- matrix(par[1:4], 2,2, byrow=TRUE) # transition matrix
-  B   <- matrix(par[5:10], 2,3, byrow=TRUE) # input matrix
-
-  L <- matrix(c(par[11], 0, par[12], par[13]), 2,2, byrow=TRUE) # lower-triangle of system covariance matrix
-
-  Q <- L %*% t(L) # THAT IS!!! The system covariance matrix is given by Qlt %*% t(Qlt) (and is this symmetric positive definite)
-
-  C   <- matrix(c(1, 0), 1,2) # observation matrix
-  R <- matrix(par[14], 1,1) # observation noise covariance matrix
-
-  X0  <- matrix(df$Y[1], 2,1) # initial state
-
-  # Variables
-  obs_cols <- c("Y") # observation column names
-  input_cols <- c("Ta","S","I") # input column names
-
-  # pull out data
-  Y  <- as.matrix(df[, obs_cols])     # m×T
-  U  <- as.matrix(df[, input_cols])   # p×T
-
-  # init
-  Tn     <- nrow(df)
-  x_est  <- matrix(Y[1,], 2, 1)            # start state from first obs
-  # x_est  <- X0 
-  P_est  <- diag(1e1, 2)                   # X0 prior covariance
+# log-likelihood only (for optim)
+kf_logLik_dt <- function(par, df, return_residuals = FALSE) {
+  # unpack
+  A <- matrix(par[1:4], 2, 2)
+  B <- matrix(par[5:10], 2, 3)
+  L <- matrix(c(par[11], 0, par[12], par[13]), 2, 2)
+  Q <- L %*% t(L)
+  C <- matrix(c(1, 0), nrow=1)
+  R <- matrix(par[14]^2, 1, 1)
+  X0 <- matrix(par[15:16], 2, 1)
+  
+  # data
+  Y <- as.matrix(df[,"Y",drop=FALSE])
+  U <- as.matrix(df[,c("Ta","S","I")])
+  Tn <- nrow(df)
+  
+  # initialize
+  n      <- nrow(A)
+  x_est  <- matrix(Y[1,], n, 1)
+  x_est <- X0
+  P_est  <- diag(1e1, n)
   logLik <- 0
 
-  for (t in 1:Tn) {
-    # prediction step
-    x_pred <- A %*% x_est + B %*% matrix(U[t,], 3,1) # write the prediction step
-    P_pred <- A %*% P_est %*% t(A) + Q # write the prediction step (Sigma_xx)
+  residuals <- numeric(Tn)
+  
+  for(t in 1:Tn) {
+    # predict
+    x_pred <- A %*% x_est + B %*% t(U[t, , drop = FALSE])
+    P_pred <- A %*% P_est %*% t(A) + Q
+    
+    # innovation
+    y_pred <- C %*% x_pred
+    S_t    <- C %*% P_pred %*% t(C) + R
+    innov  <- Y[t,] - y_pred
 
-    # innovation step
-    y_pred  <- C %*% x_pred # predicted observation
-    S_t     <- C %*% P_pred %*% t(C) + R # predicted observation covariance (Sigma_yy)
-    innov   <- matrix(Y[t,],1,1) - y_pred # innovation (one-step prediction error)
-
-    # log-likelihood contribution
-    logLik <- logLik - 0.5*(sum(log(2*pi*S_t)) + t(innov) %*% solve(S_t, innov))
-
-    # update step
-    K_t    <- P_pred %*% t(C) %*% solve(S_t) # Kalman gain
-    x_est  <- x_pred + K_t %*% innov # reconstructed state
-    P_est  <- (diag(2) - K_t %*% C) %*% P_pred # reconstructed covariance
+    residuals[t] <- innov  # store residual
+    
+    # accumulate log-lik
+    logLik <- logLik - 0.5 * (log(2 * pi) + log(det(S_t)) + t(innov) %*% solve(S_t, innov))
+    
+    # update
+    K_t   <- P_pred %*% t(C) %*% solve(S_t)
+    x_est <- x_pred + K_t %*% innov
+    P_est <- (diag(n) - K_t %*% C) %*% P_pred
+  }
+  
+  if (return_residuals) {
+    return(residuals)
+  } else {
+    return(as.numeric(logLik))
   }
 
   as.numeric(logLik)
@@ -68,37 +69,55 @@ estimate_dt <- function(start_par, df, lower=NULL, upper=NULL) {
 
 ### Load data
 df <- read.csv("assignment4/transformer_data.csv")
-df
 
 # Initial parameter values
 start_par <- c(
   # A: 2x2 state transition matrix
-   0.9,  0.1,   # A11, A12
+   0.9,  0.0,   # A11, A12
    0.0,  0.9,   # A21, A22
   
   # B: 2x3 input matrix (inputs are Ta, S, I)
-   0.05, 0.01, 0.1,   # B11, B12, B13 (effect of Ta, S, I on state 1)
-   0.02, 0.01, 0.1,   # B21, B22, B23 (effect on state 2)
+   0.01, 0.01, 0.01,   # B11, B12, B13 (effect of Ta, S, I on state 1)
+   0.01, 0.01, 0.01,   # B21, B22, B23 (effect on state 2)
   
   # Q (process noise covariance matrix, lower-triangular Cholesky)
-   0.1,   # L11
-   0.01,  # L21
-   0.1,   # L22
+   1,   # L11
+   0.01,  # L21 
+   1,   # L22
   
   # R: observation noise variance (scalar, must be > 0)
-   0.5    # R
+    1,    # R
+
+  # initial X0
+    20.0, 20.0
 )
 
 # Lower and upper bounds for parameters
-lower <- c(rep(-1, 4),   # A entries
-           rep(-1, 6),   # B entries
-           1e-4, -1, 1e-4, # L11, L21, L22 (L11, L22 > 0 for Cholesky)
-           1e-4)          # R > 0
+lower <- rep(-10, length(start_par))
+upper <- rep(10, length(start_par))
+lower[11] <- lower[13] <- 1e-3   # Q diagonal elements must be >0
+lower[14] <- 1e-3                # sigma2 > 0
 
-upper <- c(rep(1.5, 4),   # A
-           rep(1, 6),     # B
-           10,  10, 10,   # Q
-           10)            # R
 
 # Run the optimization
-estimate_dt(start_par, df, lower = lower, upper = upper)
+result_2d <- estimate_dt(start_par, df, lower, upper)
+params_2d <- result_2d$par
+
+residuals_2d <- kf_logLik_dt(params_2d, df, return_residuals = TRUE)
+
+pdf("plots/exer23.pdf", width = 10, height = 6)
+par(mfrow = c(2, 2))
+
+plot(residuals_2d, type = 'l', main = 'Residuals', ylab = "Residuals", xlab = "Time")
+acf(residuals_2d, main = 'ACF of Residuals')
+pacf(residuals_2d, main = 'PACF of Residuals')
+qqnorm(residuals_2d); qqline(residuals_2d)
+
+logLik_2d <- -kf_logLik_dt(params_2d, df)
+n <- nrow(df)
+k <- length(params_2d)
+AIC_2d <- -2 * logLik_2d + 2 * k
+BIC_2d <- -2 * logLik_2d + log(n) * k
+cat("AIC (2D):", AIC_2d, "\nBIC (2D):", BIC_2d, "\n")
+
+dev.off()
