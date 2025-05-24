@@ -12,12 +12,12 @@ kf_logLik_dt <- function(par, df, return_residuals = FALSE) {
   
   # data
   Y <- as.matrix(df[,"Y",drop=FALSE])
-  U <- as.matrix(df[,c("Ta","S","I")])
+  U <- as.matrix(df[,c("Ta_s","S_s","I_s")])
   Tn <- nrow(df)
   
   # initialize
   n      <- nrow(A)
-  x_est  <- matrix(Y[1,], n, 1)
+  # x_est  <- matrix(Y[1,], n, 1)
   x_est <- X0
   P_est  <- diag(1e1, n)
   logLik <- 0
@@ -26,7 +26,7 @@ kf_logLik_dt <- function(par, df, return_residuals = FALSE) {
   
   for(t in 1:Tn) {
     # predict
-    x_pred <- A %*% x_est + B %*% t(U[t, , drop = FALSE])
+    x_pred <- A %*% x_est + B %*% matrix(U[t,], 3, 1)
     P_pred <- A %*% P_est %*% t(A) + Q
     
     # innovation
@@ -70,6 +70,11 @@ estimate_dt <- function(start_par, df, lower=NULL, upper=NULL) {
 ### Load data
 df <- read.csv("assignment4/transformer_data.csv")
 
+df$Ta_s <- scale(df$Ta)
+df$S_s  <- scale(df$S)
+df$I_s  <- scale(df$I)
+
+
 # Initial parameter values
 start_par <- c(
   # A: 2x2 state transition matrix
@@ -93,10 +98,34 @@ start_par <- c(
 )
 
 # Lower and upper bounds for parameters
-lower <- rep(-10, length(start_par))
-upper <- rep(10, length(start_par))
-lower[11] <- lower[13] <- 1e-3   # Q diagonal elements must be >0
-lower[14] <- 1e-3                # sigma2 > 0
+lower <- c(
+  -1.5, -1.5, -1.5, -1.5,  # A elements
+  -1.5, -1.5, -1.5, -1.5,   # B row 1 (3)
+  -1.5, -1.5, -1.5, -1.5,   # B row 2 (3)
+  1e-3,                # L11 > 0
+  1e-3,                # L21 > 0
+  1e-3,                # L22 > 0
+  1e-3,                # R > 0
+  10,                  # X01
+  10                   # X02
+)
+
+upper <- c(
+  1.5, 1.5, 1.5, 1.5,   # A elements
+  1.5, 1.5, 1.5, 1.5,    # B row 1 (3)
+  1.5, 1.5, 1.5, 1.5,    # B row 2 (3)
+  10,               # L11
+  10,               # L21
+  10,               # L22
+  10,               # R
+  30,               # X01
+  30                # X02
+)
+
+# lower <- rep(-10, length(start_par))
+# upper <- rep(10, length(start_par))
+# lower[11] <- lower[13] <- 1e-3   # Q diagonal elements must be >0
+# lower[14] <- 1e-3                # sigma2 > 0
 
 
 # Run the optimization
@@ -105,19 +134,32 @@ params_2d <- result_2d$par
 
 residuals_2d <- kf_logLik_dt(params_2d, df, return_residuals = TRUE)
 
-pdf("plots/exer23.pdf", width = 10, height = 6)
-par(mfrow = c(2, 2))
-
-plot(residuals_2d, type = 'l', main = 'Residuals', ylab = "Residuals", xlab = "Time")
-acf(residuals_2d, main = 'ACF of Residuals')
-pacf(residuals_2d, main = 'PACF of Residuals')
+# Plots
+par(mfrow=c(2,2))
+plot(residuals_2d, type='l', main='Residuals')
+acf(residuals_2d, main='ACF of Residuals')
+pacf(residuals_2d, main='PACF of Residuals')
 qqnorm(residuals_2d); qqline(residuals_2d)
 
+# AIC and BIC
 logLik_2d <- -kf_logLik_dt(params_2d, df)
 n <- nrow(df)
 k <- length(params_2d)
 AIC_2d <- -2 * logLik_2d + 2 * k
 BIC_2d <- -2 * logLik_2d + log(n) * k
 cat("AIC (2D):", AIC_2d, "\nBIC (2D):", BIC_2d, "\n")
+
+
+# Plotting
+png("assignment4/plots/ex2_3_standardized.png", width = 1000, height = 700)
+par(mfrow = c(2, 2), mar = c(4, 4, 3, 1))
+
+plot(residuals_2d, type = 'l', main = 'Residuals', ylab = "Residuals", xlab = "Time")
+acf(residuals_2d, main = 'Autocorrelation Function (ACF)')
+pacf(residuals_2d, main = 'Partial Autocorrelation Function (PACF)')
+qqnorm(residuals_2d, main = 'Normal Q-Q Plot')
+qqline(residuals_2d)
+
+
 
 dev.off()

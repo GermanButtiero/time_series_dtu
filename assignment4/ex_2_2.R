@@ -3,7 +3,7 @@
 kf_logLik_dt <- function(par, df, return_residuals = FALSE) {
   # unpack
   A <- matrix(par[1], 1, 1)
-  B <- matrix(par[2:4], 1, 3)
+  B <- matrix(start_par[2:4], 1, 3)
   L <- matrix(par[5], 1, 1) 
   Q <- L %*% t(L)
   C <- matrix(1, 1, 1)
@@ -12,12 +12,12 @@ kf_logLik_dt <- function(par, df, return_residuals = FALSE) {
   
   # data
   Y <- as.matrix(df[,"Y",drop=FALSE])
-  U <- as.matrix(df[,c("Ta","S","I")])
+  U <- as.matrix(df[,c("Ta_s","S_s","I_s")])
   Tn <- nrow(df)
   
   # initialize
   n      <- nrow(A)
-  x_est  <- matrix(Y[1,], n, 1)
+  # x_est  <- matrix(Y[1,], n, 1)
   x_est <- X0
   P_est  <- diag(1e1, n)
   logLik <- 0
@@ -26,7 +26,7 @@ kf_logLik_dt <- function(par, df, return_residuals = FALSE) {
   
   for(t in 1:Tn) {
     # predict
-    x_pred <- A %*% x_est + B %*% t(U[t, , drop = FALSE])
+    x_pred <- A %*% x_est + B %*% matrix(U[t,], 3, 1)
     P_pred <- A %*% P_est %*% t(A) + Q
     
     # innovation
@@ -66,11 +66,12 @@ estimate_dt <- function(start_par, df, lower=NULL, upper=NULL) {
 }
 
 
-
-
 ### Load data
 df <- read.csv("assignment4/transformer_data.csv")
-df
+
+df$Ta_s <- scale(df$Ta)
+df$S_s  <- scale(df$S)
+df$I_s  <- scale(df$I)
 
 # Initial parameter values
 start_par <- c(
@@ -89,6 +90,17 @@ upper <- c(1.5, 1, 1, 1, 10, 10, 30)
 
 # Run the optimization
 result <- estimate_dt(start_par, df, lower, upper)
+
+# Using a different optimizer to escape local minima
+# result <- nlminb(
+#   start     = start_par,
+#   objective = function(par) -kf_logLik_dt(par, df),
+#   lower     = lower,
+#   upper     = upper,
+#   control   = list(trace = 1)
+# )
+
+
 params <- result$par
 
 # Residuals
@@ -110,7 +122,7 @@ BIC <- -2 * logLik + log(n) * k
 cat("AIC:", AIC, "\nBIC:", BIC, "\n")
 
 # Residual diagnostics
-pdf("images/exer22.pdf", width = 10, height = 6)
+png("assignment4/plots/ex2_2_standardized.png", width = 1000, height = 700)
 par(mfrow = c(2, 2), mar = c(4, 4, 3, 1))
 
 # Residuals plot
