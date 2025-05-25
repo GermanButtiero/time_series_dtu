@@ -12,7 +12,7 @@ kf_logLik_dt <- function(par, df, return_residuals = FALSE) {
   
   # data
   Y <- as.matrix(df[,"Y",drop=FALSE])
-  U <- as.matrix(df[,c("Ta_s","S_s","I_s")])
+  U <- as.matrix(df[,c("Ta","S","I")])
   Tn <- nrow(df)
   
   # initialize
@@ -69,9 +69,10 @@ estimate_dt <- function(start_par, df, lower=NULL, upper=NULL) {
 ### Load data
 df <- read.csv("assignment4/transformer_data.csv")
 
-df$Ta_s <- scale(df$Ta)
-df$S_s  <- scale(df$S)
-df$I_s  <- scale(df$I)
+# df$Ta_s <- scale(df$Ta)
+# df$S_s  <- scale(df$S)
+# df$I_s  <- scale(df$I)
+# df$Y_s <- scale(df$Y)
 
 # Initial parameter values
 start_par <- c(
@@ -117,12 +118,12 @@ qqnorm(residuals); qqline(residuals)
 logLik <- -kf_logLik_dt(params, df)
 n <- nrow(df)
 k <- length(params)
-AIC <- -2 * logLik + 2 * k
-BIC <- -2 * logLik + log(n) * k
+AIC <- 2 * logLik + 2 * k
+BIC <- 2 * logLik + log(n) * k
 cat("AIC:", AIC, "\nBIC:", BIC, "\n")
 
 # Residual diagnostics
-png("assignment4/plots/ex2_2_standardized.png", width = 1000, height = 700)
+png("assignment4/plots/ex2_2.png", width = 1000, height = 700, res = 150, pointsize = 9)
 par(mfrow = c(2, 2), mar = c(4, 4, 3, 1))
 
 # Residuals plot
